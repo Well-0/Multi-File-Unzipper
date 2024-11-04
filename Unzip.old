@@ -1,0 +1,25 @@
+
+
+
+
+setlocal
+
+set "folderPath=%~1"
+
+if not defined folderPath (
+    set /p "folderPath=Enter the folder path: "
+)
+
+:: Change to the drive of the folder path
+%folderPath:~0,2%
+
+for %%i in ("%folderPath%\*.zip") do (
+    powershell -command "Expand-Archive -Path '%%i' -DestinationPath '%folderPath%' -Force -Verbose"
+)
+ 
+
+endlocal
+
+pause
+
+::D:\[GigaCourse.Com] Udemy - The Complete 2024 Web Development Bootcamp\04 - Multi-Page Websites

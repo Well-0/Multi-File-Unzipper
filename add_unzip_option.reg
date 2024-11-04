@@ -1,0 +1,8 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\Directory\shell\Unzip All Zip Files]
+@="Unzip All Zip Files Here"
+"Icon"="shell32.dll,45"
+
+[HKEY_CLASSES_ROOT\Directory\shell\Unzip All Zip Files\command]
+@="powershell -NoExit -NoProfile -ExecutionPolicy Bypass -File \"C:\\Scripts\\UnzipAll.ps1\" \"%1\""
