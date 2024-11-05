@@ -26,33 +26,40 @@ if ($zipFiles.Count -eq 0) {
 
 foreach ($zipFile in $zipFiles) {
     # Create a new directory for extraction using the base name of the zip file
-    $baseName = [System.IO.Path]::GetFileNameWithoutExtension($zipFile.Name)
+    #$baseName = [System.IO.Path]::GetFileNameWithoutExtension($zipFile.Name)
  
     #Join-Path -Path $zipFile.DirectoryName -ChildPath $baseName
-
-
-    
-    
     try {
-        Write-Output "`nExtracting $($zipFile.FullName) to $folderPath"
+        Write-Output "`nExtracting $($zipFile.FullName) to "
 
-        $ExtractedFolderName = $zipFile -replace ".zip$"
+        $ExtractedFolderPath = $zipFile.FullName -replace ".zip$"
 
-        Write-Output "`nPrepping folder: $ExtractedFolderName  "
+        Write-Output "`nPrepping folder: $ExtractedFolderPath  "
         
-        $ExtractedFolderPath = Split-Path -Path $ExtractedFolderName -Leaf  
-        Write-Output "`nExtracted folder path: $ExtractedFolderPath"
+        $ExtractedFolderName = Split-Path -Path $ExtractedFolderPath -Leaf  
+        Write-Output "`nExtracted folder path: $ExtractedFolderName"
 
-        $destinationPath = Join-Path -Path $folderPath -ChildPath $ExtractedFolderPath 
+        #$destinationPath = Join-Path -Path $folderPath -ChildPath $ExtractedFolderPath 
 
                 # Create the destination directory if it doesn't exist
-                if (-not (Test-Path $destinationPath)) {
-                    New-Item -Path $destinationPath -ItemType Directory | Out-Null
-                }
+      
+
         #Out null -> to suppress the output
 
         #  extract the zip file
-        Expand-Archive -Path $zipFile.FullName -DestinationPath $destinationPath -Force
+        #Expand-Archive -Path $zipFile -DestinationPath $destinationPath -Force
+
+        # Extract the zip file and overwrite existing files
+        Expand-7Zip -ArchiveFileName $zipFile.FullName -TargetPath $ExtractedFolderPath 
+        
+
+       #Add-Type -AssemblyName System.IO.Compression.FileSystem
+       #[System.IO.Compression.ZipFile]::ExtractToDirectory($zipFile.FullName, "$folderPath\$ExtractedFolderName") 
+        
+
+
+
+        Write-Output "Extraction completed."
 
         $extractedItems = Get-ChildItem -Path $destinationPath -Recurse
         Write-Output "Extracted $(($extractedItems | Measure-Object).Count) items"
@@ -64,10 +71,15 @@ foreach ($zipFile in $zipFiles) {
         }
     }
     catch {
+        $errorLineNumber = $_.InvocationInfo.ScriptLineNumber
+        $scriptFilePath = $_.InvocationInfo.ScriptName
+        $errorLine = (Get-Content -Path $scriptFilePath)[$errorLineNumber - 1]
+    
         Write-Output "ERROR extracting $($zipFile.FullName): $($_.Exception.Message)"
+        Write-Output "Error occurred at line $errorLineNumber : $errorLine"
     }
 }
 Write-Output "Extraction completed."
 Start-Sleep -Seconds 2
-#D:\[GigaCourse.Com] Udemy - The Complete 2024 Web Development Bootcamp\04 - Multi-Page Websites
+#D:\`[GigaCourse.Com`] Udemy - The Complete 2024 Web Development Bootcamp\04 - Multi-Page Websites
 #e.g zip file names Jessie.zip , walter.zip , etc
